@@ -14,15 +14,12 @@ start :: Board
 start = M.union glider bipole
 
 display :: Int -> Board -> String
-display n = unlines . M.foldrWithKey plot blank
+display n b = unlines [ concat [ plot (x, y) b | x <- bounds ] | y <- reverse bounds ]
     where
-  blank = replicate (2*n) $ replicate (2*n) ' '
-  inBounds k = -n < k && k <= n
-  plot (x, y) _ p
-   | inBounds x && inBounds y = let (j, k:l) = splitAt (n - y) p
-                                 in let (a, _:c) = splitAt (n - 1 + x) k
-                                     in j ++ [a ++ "*" ++ c] ++ l
-   | otherwise                = p
+  bounds = [1 - n..n]
+  plot (x, y) = depends "◀▶" "  " . M.member (x, y)
+  depends x _ True = x
+  depends _ y _    = y
 
 -- Private
 
@@ -34,9 +31,10 @@ born     b = M.map (const 1)  . M.filter (==3) $ neighborCounts b
 
 neighborCounts :: Board -> Board
 neighborCounts b = M.unionsWith (+) $ fmap ($ b)
-  [ shift (-1,-1), shift (0,-1), shift (1,-1)
+  [ shift (-1, 1), shift (0, 1), shift (1, 1)
   , shift (-1, 0),               shift (1, 0)
-  , shift (-1, 1), shift (0, 1), shift (1, 1) ]
+  , shift (-1,-1), shift (0,-1), shift (1,-1)
+  ]
 
 shift :: Coordinate -> Board -> Board
 shift (dx, dy) = M.mapKeysMonotonic $ (+ dx) *** (+ dy)
