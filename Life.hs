@@ -10,19 +10,24 @@ type Coordinate = (Int, Int)
 type Board = M.Map Coordinate Int
 
 main :: IO ()
-main = void . sequence $ draw . display 10 <$> frames
+main = void . sequence $ draw . display size <$> frames
 
 frames :: [Board]
-frames = take 100 $ iterate generation $ M.union (shift (10, -10) glider) bipole
+frames = take duration . iterate generation $ M.union (shift (12,-8) glider) bipole
+
+size, duration, wait :: Int
+size     = 16     -- length of half the side
+duration = 90     -- number of frames
+wait     = 9*10^4 -- microseconds between frames
 
 glider :: Board
-glider = fromCoordinates [(1,1),(1,2),(1,3),(2,3),(3,2)]
+glider = fromCoordinates [(-1,-1),(-1,0),(-1,1),(0,1),(1,0)]
 
 bipole :: Board
 bipole = fromCoordinates [(-2,1),(-2,2),(-1,2),(0,1),(0,-1),(1,-2),(2,-2),(2,-1)]
 
 draw :: String -> IO ()
-draw s = threadDelay (10^5) *> system "clear" *> putStrLn s
+draw s = threadDelay wait *> system "clear" *> putStrLn s
 
 -- 2n x 2n display
 display :: Int -> Board -> String
