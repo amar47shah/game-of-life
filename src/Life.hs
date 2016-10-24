@@ -96,8 +96,8 @@ fromFile = fmap readBoard . readFile
 readBoard :: String -> Board
 readBoard = fromCoordinates . (liveCoords =<<) . number . boardLines
     where
-  liveCoords (cs, y) = map (snd &&& const y) . filter ((== live) . fst) $ number cs
-  number = zipWith (flip (,)) [0..]
+  liveCoords (y, cs) = map (id *** const y) . filter ((== live) . snd) $ number cs
+  number = zipWith (,) [0..]
   boardLines = filter ((`elem` [live, dead]) . head) . filter (not . null) . lines
   (live, dead) = ('O', '.')
 
