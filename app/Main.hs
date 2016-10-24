@@ -16,6 +16,6 @@ draw :: String -> IO ()
 draw s = threadDelay wait *> system "clear" *> putStrLn s
 
 size, duration, wait :: Int
-size     = 16     -- length of half the side
-duration = 90     -- number of frames
+size     = 20     -- length of half the side
+duration = 160    -- number of frames
 wait     = 9*10^4 -- microseconds between frames
