@@ -7,4 +7,6 @@
 4. `stack build` to compile.
 5. `stack exec game-of-life-exe` to run.
 6. Zoom out (or in) in your terminal to fit the board.
-7. You can also adjust `size`, `ticks`, and `wait` in `app/Main.hs`.
+7. You can change `start` in `src/Life.hs` to any pattern exported from `src/Life/Pattern.hs`.
+8. You can also adjust `size`, `ticks`, and `wait` in `app/Main.hs`.
+8. Don't forget to compile again after adjusting the code.
