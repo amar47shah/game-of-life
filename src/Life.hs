@@ -1,6 +1,7 @@
 module Life (Board, display, generation, start) where
 
 import Control.Arrow ((&&&), (***))
+import Data.Bool (bool)
 import qualified Data.Map as M
 
 -- Exported
@@ -18,9 +19,7 @@ display n b =
   unlines [ concat [ plot (x, y) b | x <- bounds ] | y <- reverse bounds ]
     where
   bounds = [1 - n..n]
-  plot (x, y) = depends "◀▶" "  " . M.member (x, y)
-  depends x _ True = x
-  depends _ y _    = y
+  plot = bool "  " "◀▶" ... M.member
 
 -- Private
 
