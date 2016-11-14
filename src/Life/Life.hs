@@ -16,7 +16,7 @@ fromCells :: [Cell] -> Life
 fromCells = M.fromList ... fmap $ id &&& const 1
 
 generation :: Life -> Life
-generation = uncurry M.union . (survived &&& born)
+generation = M.union <$> survived <*> born
 
 isLive :: Cell -> Life -> Bool
 isLive = M.member
@@ -35,21 +35,21 @@ fromFile :: FilePath -> IO Life
 fromFile = fmap readLife . readFile
 
 readLife :: String -> Life
-readLife = fromCells . (liveCells =<<) . number . boardLines
+readLife = fromCells . concatMap liveCells . indexed . boardLines
     where
-  liveCells (y, cs) = map (id *** const y) . filter ((== live) . snd) $ number cs
-  number = zipWith (,) [0..]
-  boardLines = filter ((`elem` [live, dead]) . head) . filter (not . null) . lines
+  liveCells (y, cs) = map (const y <$>) . filter snd . indexed $ map (== live) cs
+  indexed = zipWith (,) [0..]
+  boardLines = filter isBoardLine . lines
+  isBoardLine = and . sequenceA [not . null, (`elem` [live, dead]) . head]
   (live, dead) = ('O', '.')
 
 survived, born :: Life -> Life
-survived b = M.intersection b . M.filter (==2) $ neighborCounts b
-born     b = M.map (const 1)  . M.filter (==3) $ neighborCounts b
+survived = M.intersection <*> M.filter (==2) . neighborCounts
+born     = M.map (const 1)  . M.filter (==3) . neighborCounts
 
 neighborCounts :: Life -> Life
-neighborCounts l = M.unionsWith (+) $ fmap ($ l)
+neighborCounts = M.unionsWith (+) . sequenceA
   [ shift (-1, 1), shift (0, 1), shift (1, 1)
   , shift (-1, 0),               shift (1, 0)
   , shift (-1,-1), shift (0,-1), shift (1,-1)
   ]
-
